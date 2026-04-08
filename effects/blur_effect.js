@@ -1,6 +1,5 @@
 'use strict';
 
-import Shell from 'gi://Shell';
 import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Clutter from 'gi://Clutter';
@@ -13,7 +12,9 @@ const getBlurShaderSource = (extensionDir) => {
   ]);
 
   try {
-    return Shell.get_file_contents_utf8_sync(SHADER_PATH);
+    const [ok, contents] = GLib.file_get_contents(SHADER_PATH);
+    if (!ok) return null;
+    return new TextDecoder().decode(contents);
   } catch (e) {
     log(`[d2dl] error loading shader from ${SHADER_PATH}: ${e}`);
     return null;
@@ -127,13 +128,9 @@ export const BlurEffect = GObject.registerClass(
       this.set_enabled(this.blend > 0 && this._static);
     }
 
-    vfunc_paint_target(paint_node = null, paint_context = null) {
+    vfunc_paint_target(paint_node, paint_context) {
       this.set_uniform_value('tex', 0);
-
-      if (paint_node && paint_context)
-        super.vfunc_paint_target(paint_node, paint_context);
-      else if (paint_node) super.vfunc_paint_target(paint_node);
-      else super.vfunc_paint_target();
+      super.vfunc_paint_target(paint_node, paint_context);
     }
   }
 );

@@ -424,7 +424,7 @@ export let Dock = GObject.registerClass(
 
       Main.layoutManager.addChrome(this.struts, {
         affectsStruts: !this.extension.autohide_dash,
-        ...(Config.PACKAGE_VERSION[0] == '4'
+        ...(parseInt(Config.PACKAGE_VERSION) < 50
           ? { affectsInputRegion: true }
           : {}),
         trackFullscreen: false,
